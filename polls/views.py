@@ -1,20 +1,28 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render,get_object_or_404
 from django.db.models import F
 from django.urls import reverse
 from .models import Question,Choice
 from django.views import generic
-
+from django.utils import timezone
 
 class IndexView(generic.ListView):
-    model = Question
     context_object_name = "latest_question_list"
     template_name = "polls/index.html"
+    
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
+        :5
+    ]
 
 
 class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 class ResultsView(generic.DetailView):
     model = Question
